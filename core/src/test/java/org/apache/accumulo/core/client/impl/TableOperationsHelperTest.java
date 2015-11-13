@@ -39,6 +39,7 @@ import org.apache.accumulo.core.client.admin.NewTableConfiguration;
 import org.apache.accumulo.core.client.admin.SamplerConfiguration;
 import org.apache.accumulo.core.client.admin.TimeType;
 import org.apache.accumulo.core.data.Range;
+import org.apache.accumulo.core.data.TabletId;
 import org.apache.accumulo.core.iterators.IteratorUtil.IteratorScope;
 import org.apache.accumulo.core.security.Authorizations;
 import org.apache.hadoop.io.Text;
@@ -241,6 +242,12 @@ public class TableOperationsHelperTest {
 
     @Override
     public SamplerConfiguration getSamplerConfiguration(String tableName) throws TableNotFoundException, AccumuloException, AccumuloSecurityException {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Map<String,Map<TabletId,List<Range>>> locate(String tableName, Collection<Range> ranges) throws AccumuloException, AccumuloSecurityException,
+        TableNotFoundException {
       throw new UnsupportedOperationException();
     }
   }

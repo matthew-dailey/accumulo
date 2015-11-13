@@ -83,8 +83,10 @@ import org.apache.accumulo.core.constraints.Constraint;
 import org.apache.accumulo.core.data.ByteSequence;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Range;
+import org.apache.accumulo.core.data.TabletId;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.data.impl.KeyExtent;
+import org.apache.accumulo.core.data.impl.TabletIdImpl;
 import org.apache.accumulo.core.iterators.IteratorUtil;
 import org.apache.accumulo.core.iterators.IteratorUtil.IteratorScope;
 import org.apache.accumulo.core.iterators.SortedKeyValueIterator;
@@ -120,6 +122,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
 import com.google.common.net.HostAndPort;
 
 public class TableOperationsImpl extends TableOperationsHelper {
@@ -1513,4 +1516,50 @@ public class TableOperationsImpl extends TableOperationsHelper {
     return sci.toSamplerConfiguration();
   }
 
+  @Override
+  public Map<String,Map<TabletId,List<Range>>> locate(String tableName, Collection<Range> ranges) throws AccumuloException, AccumuloSecurityException,
+      TableNotFoundException {
+    Preconditions.checkNotNull(tableName, "tableName must be non null");
+    Preconditions.checkNotNull(ranges, "ranges must be non null");
+
+    String tableId = Tables.getTableId(context.getInstance(), tableName);
+    TabletLocator locator = TabletLocator.getLocator(context, new Text(tableId));
+
+    List<Range> rangeList = null;
+    if (ranges instanceof List) {
+      rangeList = (List<Range>) ranges;
+    } else {
+      rangeList = new ArrayList<>(ranges);
+    }
+
+    Map<String,Map<KeyExtent,List<Range>>> binnedRanges = new HashMap<>();
+
+    locator.invalidateCache();
+
+    while (!locator.binRanges(context, rangeList, binnedRanges).isEmpty()) {
+
+      if (!Tables.exists(context.getInstance(), tableId))
+        throw new TableDeletedException(tableId);
+      if (Tables.getTableState(context.getInstance(), tableId) == TableState.OFFLINE)
+        throw new TableOfflineException(context.getInstance(), tableId);
+
+      binnedRanges.clear();
+
+      // TODO sleep/use Retry
+
+      locator.invalidateCache();
+    }
+
+    Map<String,Map<TabletId,List<Range>>> ret = new HashMap<>();
+
+    for (Entry<String,Map<KeyExtent,List<Range>>> entry : binnedRanges.entrySet()) {
+      Map<TabletId,List<Range>> tabletMap = new HashMap();
+      ret.put(entry.getKey(), tabletMap);
+      for (Entry<KeyExtent,List<Range>> entry2 : entry.getValue().entrySet()) {
+        tabletMap.put(new TabletIdImpl(entry2.getKey()), entry2.getValue());
+      }
+    }
+
+    return ret;
+  }
 }

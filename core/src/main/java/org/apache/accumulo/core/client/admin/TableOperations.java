@@ -31,6 +31,7 @@ import org.apache.accumulo.core.client.IteratorSetting;
 import org.apache.accumulo.core.client.TableExistsException;
 import org.apache.accumulo.core.client.TableNotFoundException;
 import org.apache.accumulo.core.data.Range;
+import org.apache.accumulo.core.data.TabletId;
 import org.apache.accumulo.core.iterators.IteratorUtil.IteratorScope;
 import org.apache.accumulo.core.security.Authorizations;
 import org.apache.hadoop.io.Text;
@@ -229,6 +230,19 @@ public interface TableOperations {
    * @since 1.5.0
    */
   Collection<Text> listSplits(String tableName, int maxSplits) throws TableNotFoundException, AccumuloSecurityException, AccumuloException;
+
+  /**
+   * Locates the tablet servers and tablets that would service a collections of ranges. If a range covers multiple tablets, it will occur multiple times in the
+   * returned map.
+   *
+   * @param ranges
+   *          The input ranges that should be mapped to tablet servers and tablets.
+   * @return A map of tablet servers locations to a map of tablet locations to a list of ranges.
+   *
+   * @since 1.8.0
+   */
+  Map<String,Map<TabletId,List<Range>>> locate(String tableName, Collection<Range> ranges) throws AccumuloException, AccumuloSecurityException,
+      TableNotFoundException;
 
   /**
    * Finds the max row within a given range. To find the max row in a table, pass null for start and end row.
