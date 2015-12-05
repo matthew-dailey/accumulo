@@ -20,11 +20,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map.Entry;
-
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.util.format.DefaultFormatter;
 import org.apache.accumulo.core.util.format.Formatter;
+import org.apache.accumulo.core.util.format.FormatterConfig;
 import org.apache.accumulo.tracer.thrift.Annotation;
 import org.apache.accumulo.tracer.thrift.RemoteSpan;
 import org.apache.commons.lang.NotImplementedException;
@@ -54,7 +54,7 @@ public class TraceFormatter implements Formatter {
   private final static Text SPAN_CF = new Text("span");
 
   private Iterator<Entry<Key,Value>> scanner;
-  private boolean printTimeStamps;
+  private FormatterConfig config;
 
   public static RemoteSpan getRemoteSpan(Entry<Key,Value> entry) {
     TMemoryInputTransport transport = new TMemoryInputTransport(entry.getValue().get());
@@ -99,12 +99,12 @@ public class TraceFormatter implements Formatter {
         }
       }
 
-      if (printTimeStamps) {
+      if (config.willPrintTimestamps()) {
         result.append(String.format(" %-12s:%d%n", "timestamp", next.getKey().getTimestamp()));
       }
       return result.toString();
     }
-    return DefaultFormatter.formatEntry(next, printTimeStamps);
+    return DefaultFormatter.formatEntry(next, config.willPrintTimestamps());
   }
 
   @Override
@@ -113,8 +113,8 @@ public class TraceFormatter implements Formatter {
   }
 
   @Override
-  public void initialize(Iterable<Entry<Key,Value>> scanner, boolean printTimestamps) {
+  public void initialize(Iterable<Entry<Key,Value>> scanner, FormatterConfig config) {
     this.scanner = scanner.iterator();
-    this.printTimeStamps = printTimestamps;
+    this.config = config;
   }
 }

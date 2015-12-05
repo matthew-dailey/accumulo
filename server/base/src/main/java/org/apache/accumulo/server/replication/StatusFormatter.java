@@ -22,7 +22,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
-
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.metadata.schema.MetadataSchema.ReplicationSection;
@@ -34,6 +33,7 @@ import org.apache.accumulo.core.security.ColumnVisibility;
 import org.apache.accumulo.core.util.format.DefaultFormatter;
 import org.apache.accumulo.core.util.format.DefaultFormatter.DefaultDateFormat;
 import org.apache.accumulo.core.util.format.Formatter;
+import org.apache.accumulo.core.util.format.FormatterConfig;
 import org.apache.accumulo.server.replication.proto.Replication.Status;
 import org.apache.hadoop.io.Text;
 import org.slf4j.Logger;
@@ -52,7 +52,7 @@ public class StatusFormatter implements Formatter {
       WorkSection.NAME, OrderSection.NAME));
 
   private Iterator<Entry<Key,Value>> iterator;
-  private boolean printTimestamps;
+  private FormatterConfig config;
 
   /* so a new date object doesn't get created for every record in the scan result */
   private static ThreadLocal<Date> tmpDate = new ThreadLocal<Date>() {
@@ -77,7 +77,7 @@ public class StatusFormatter implements Formatter {
   @Override
   public String next() {
     Entry<Key,Value> entry = iterator.next();
-    DateFormat timestampFormat = printTimestamps ? formatter.get() : null;
+    DateFormat timestampFormat = config.willPrintTimestamps() ? formatter.get() : null;
 
     // If we expected this to be a protobuf, try to parse it, adding a message when it fails to parse
     if (REPLICATION_COLFAMS.contains(entry.getKey().getColumnFamily())) {
@@ -157,9 +157,9 @@ public class StatusFormatter implements Formatter {
   }
 
   @Override
-  public void initialize(Iterable<Entry<Key,Value>> scanner, boolean printTimestamps) {
+  public void initialize(Iterable<Entry<Key,Value>> scanner, FormatterConfig config) {
     this.iterator = scanner.iterator();
-    this.printTimestamps = printTimestamps;
+    this.config = config;
   }
 
 }
