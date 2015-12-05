@@ -102,8 +102,8 @@ public class GetSplitsCommand extends Command {
     if (text == null) {
       return null;
     }
-    BinaryFormatter.getlength(text.getLength());
-    return encode ? Base64.encodeBase64String(TextUtil.getBytes(text)) : BinaryFormatter.appendText(new StringBuilder(), text).toString();
+    final int length = text.getLength();
+    return encode ? Base64.encodeBase64String(TextUtil.getBytes(text)) : BinaryFormatter.appendText(new StringBuilder(), text, length).toString();
   }
 
   private static String obscuredTabletName(final KeyExtent extent) {
