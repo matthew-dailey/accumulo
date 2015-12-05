@@ -25,8 +25,8 @@ import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 
 public class DateStringFormatter implements Formatter {
-  private boolean printTimestamps = false;
   private DefaultFormatter defaultFormatter = new DefaultFormatter();
+  private FormatterConfig config;
 
   public static final String DATE_FORMAT = "yyyy/MM/dd HH:mm:ss.SSS";
   // SimpleDataFormat is not thread safe
@@ -38,9 +38,8 @@ public class DateStringFormatter implements Formatter {
   };
 
   @Override
-  public void initialize(Iterable<Entry<Key,Value>> scanner, boolean printTimestamps) {
-    this.printTimestamps = printTimestamps;
-    defaultFormatter.initialize(scanner, printTimestamps);
+  public void initialize(Iterable<Entry<Key,Value>> scanner, FormatterConfig config) {
+    defaultFormatter.initialize(scanner, config);
   }
 
   @Override
@@ -52,7 +51,7 @@ public class DateStringFormatter implements Formatter {
   public String next() {
     DateFormat timestampformat = null;
 
-    if (printTimestamps) {
+    if (defaultFormatter.isDoTimestamps()) {
       timestampformat = formatter.get();
     }
 

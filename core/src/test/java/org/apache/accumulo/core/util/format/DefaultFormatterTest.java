@@ -39,8 +39,9 @@ public class DefaultFormatterTest {
 
   @Test(expected = IllegalStateException.class)
   public void testDoubleInitialize() {
-    df.initialize(empty, true);
-    df.initialize(empty, true);
+    final FormatterConfig timestampConfig = new FormatterConfig().setPrintTimestamps(true);
+    df.initialize(empty, timestampConfig);
+    df.initialize(empty, timestampConfig);
   }
 
   @Test(expected = IllegalStateException.class)

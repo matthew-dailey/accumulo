@@ -30,7 +30,7 @@ import org.apache.hadoop.io.Text;
 
 public class DefaultFormatter implements Formatter {
   private Iterator<Entry<Key,Value>> si;
-  private boolean doTimestamps;
+  protected FormatterConfig config;
 
   public static class DefaultDateFormat extends DateFormat {
     private static final long serialVersionUID = 1L;
@@ -55,10 +55,10 @@ public class DefaultFormatter implements Formatter {
   };
 
   @Override
-  public void initialize(Iterable<Entry<Key,Value>> scanner, boolean printTimestamps) {
+  public void initialize(Iterable<Entry<Key,Value>> scanner, FormatterConfig config) {
     checkState(false);
     si = scanner.iterator();
-    doTimestamps = printTimestamps;
+    this.config = new FormatterConfig(config);
   }
 
   @Override
@@ -71,7 +71,7 @@ public class DefaultFormatter implements Formatter {
   public String next() {
     DateFormat timestampFormat = null;
 
-    if (doTimestamps) {
+    if (config.willPrintTimestamps()) {
       timestampFormat = formatter.get();
     }
 
@@ -175,6 +175,6 @@ public class DefaultFormatter implements Formatter {
   }
 
   protected boolean isDoTimestamps() {
-    return doTimestamps;
+    return config.willPrintTimestamps();
   }
 }

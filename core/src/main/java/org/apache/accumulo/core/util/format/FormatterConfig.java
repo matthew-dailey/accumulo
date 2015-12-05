@@ -31,6 +31,11 @@ public class FormatterConfig {
     this.doNotLimitShowLength();
   }
 
+  public FormatterConfig(FormatterConfig other) {
+    this.printTimestamps = other.printTimestamps;
+    this.shownLength = other.shownLength;
+  }
+
   public boolean willPrintTimestamps() {
     return printTimestamps;
   }
@@ -51,7 +56,8 @@ public class FormatterConfig {
   /**
    * If given a negative number, throws an {@link IllegalArgumentException}
    *
-   * @param shownLength maximum length of formatted output
+   * @param shownLength
+   *          maximum length of formatted output
    * @return {@code this} to allow chaining of set methods
    */
   public FormatterConfig setShownLength(int shownLength) {

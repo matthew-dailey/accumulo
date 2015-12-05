@@ -42,7 +42,7 @@ public class DateStringFormatterTest {
 
   @Test
   public void testTimestamps() {
-    formatter.initialize(data.entrySet(), true);
+    formatter.initialize(data.entrySet(), new FormatterConfig().setPrintTimestamps(true));
     formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
 
     assertTrue(formatter.hasNext());
@@ -55,7 +55,7 @@ public class DateStringFormatterTest {
 
     assertEquals(2, data.size());
 
-    formatter.initialize(data.entrySet(), false);
+    formatter.initialize(data.entrySet(), new FormatterConfig());
 
     assertEquals(formatter.next(), formatter.next());
   }

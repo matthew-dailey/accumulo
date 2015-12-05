@@ -24,60 +24,55 @@ import org.apache.accumulo.core.security.ColumnVisibility;
 import org.apache.hadoop.io.Text;
 
 public class BinaryFormatter extends DefaultFormatter {
-  private static int showLength;
-
   @Override
   public String next() {
     checkState(true);
-    return formatEntry(getScannerIterator().next(), isDoTimestamps());
+    return formatEntry(getScannerIterator().next(), config.willPrintTimestamps(), config.getShownLength());
   }
 
   // this should be replaced with something like Record.toString();
   // it would be great if we were able to combine code with DefaultFormatter.formatEntry, but that currently does not respect the showLength option.
-  public static String formatEntry(Entry<Key,Value> entry, boolean showTimestamps) {
+  public static String formatEntry(Entry<Key,Value> entry, boolean printTimestamps, int shownLength) {
     StringBuilder sb = new StringBuilder();
 
     Key key = entry.getKey();
 
     // append row
-    appendText(sb, key.getRow()).append(" ");
+    appendText(sb, key.getRow(), shownLength).append(" ");
 
     // append column family
-    appendText(sb, key.getColumnFamily()).append(":");
+    appendText(sb, key.getColumnFamily(), shownLength).append(":");
 
     // append column qualifier
-    appendText(sb, key.getColumnQualifier()).append(" ");
+    appendText(sb, key.getColumnQualifier(), shownLength).append(" ");
 
     // append visibility expression
     sb.append(new ColumnVisibility(key.getColumnVisibility()));
 
     // append timestamp
-    if (showTimestamps)
+    if (printTimestamps)
       sb.append(" ").append(entry.getKey().getTimestamp());
 
     // append value
     Value value = entry.getValue();
     if (value != null && value.getSize() > 0) {
       sb.append("\t");
-      appendValue(sb, value);
+      appendValue(sb, value, shownLength);
     }
     return sb.toString();
   }
 
-  public static StringBuilder appendText(StringBuilder sb, Text t) {
-    return appendBytes(sb, t.getBytes(), 0, t.getLength());
+  public static StringBuilder appendText(StringBuilder sb, Text t, int shownLength) {
+    return appendBytes(sb, t.getBytes(), 0, t.getLength(), shownLength);
   }
 
-  static StringBuilder appendValue(StringBuilder sb, Value value) {
-    return appendBytes(sb, value.get(), 0, value.get().length);
+  static StringBuilder appendValue(StringBuilder sb, Value value, int shownLength) {
+    return appendBytes(sb, value.get(), 0, value.get().length, shownLength);
   }
 
-  static StringBuilder appendBytes(StringBuilder sb, byte ba[], int offset, int len) {
-    int length = Math.min(len, showLength);
+  static StringBuilder appendBytes(StringBuilder sb, byte ba[], int offset, int len, int shownLength) {
+    int length = Math.min(len, shownLength);
     return DefaultFormatter.appendBytes(sb, ba, offset, length);
   }
 
-  public static void getlength(int length) {
-    showLength = length;
-  }
 }
