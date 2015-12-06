@@ -17,12 +17,9 @@
 package org.apache.accumulo.core.util.format;
 
 import java.text.DateFormat;
-import java.text.FieldPosition;
-import java.text.ParsePosition;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map.Entry;
-
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.ColumnVisibility;
@@ -32,25 +29,11 @@ public class DefaultFormatter implements Formatter {
   private Iterator<Entry<Key,Value>> si;
   protected FormatterConfig config;
 
-  public static class DefaultDateFormat extends DateFormat {
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    public StringBuffer format(Date date, StringBuffer toAppendTo, FieldPosition fieldPosition) {
-      toAppendTo.append(Long.toString(date.getTime()));
-      return toAppendTo;
-    }
-
-    @Override
-    public Date parse(String source, ParsePosition pos) {
-      return new Date(Long.parseLong(source));
-    }
-  }
-
+  /** Used as default DateFormat for some static methods */
   private static final ThreadLocal<DateFormat> formatter = new ThreadLocal<DateFormat>() {
     @Override
     protected DateFormat initialValue() {
-      return new DefaultDateFormat();
+      return new FormatterConfig.DefaultDateFormat();
     }
   };
 
@@ -72,7 +55,7 @@ public class DefaultFormatter implements Formatter {
     DateFormat timestampFormat = null;
 
     if (config.willPrintTimestamps()) {
-      timestampFormat = formatter.get();
+      timestampFormat = config.getDateFormat();
     }
 
     return next(timestampFormat);
@@ -96,7 +79,9 @@ public class DefaultFormatter implements Formatter {
       throw new IllegalStateException("Already initialized");
   }
 
-  // this should be replaced with something like Record.toString();
+  /**
+   * if showTimestamps, will use {@link org.apache.accumulo.core.util.format.FormatterConfig.DefaultDateFormat}
+   */
   public static String formatEntry(Entry<Key,Value> entry, boolean showTimestamps) {
     DateFormat timestampFormat = null;
 
@@ -115,6 +100,7 @@ public class DefaultFormatter implements Formatter {
     }
   };
 
+  /** Does not show timestamps if timestampFormat is null */
   public static String formatEntry(Entry<Key,Value> entry, DateFormat timestampFormat) {
     StringBuilder sb = new StringBuilder();
     Key key = entry.getKey();
@@ -153,8 +139,16 @@ public class DefaultFormatter implements Formatter {
     return appendBytes(sb, t.getBytes(), 0, t.getLength());
   }
 
+  public static StringBuilder appendText(StringBuilder sb, Text t, int shownLength) {
+    return appendBytes(sb, t.getBytes(), 0, t.getLength(), shownLength);
+  }
+
   static StringBuilder appendValue(StringBuilder sb, Value value) {
     return appendBytes(sb, value.get(), 0, value.get().length);
+  }
+
+  static StringBuilder appendValue(StringBuilder sb, Value value, int shownLength) {
+    return appendBytes(sb, value.get(), 0, value.get().length, shownLength);
   }
 
   static StringBuilder appendBytes(StringBuilder sb, byte ba[], int offset, int len) {
@@ -168,6 +162,11 @@ public class DefaultFormatter implements Formatter {
         sb.append("\\x").append(String.format("%02X", c));
     }
     return sb;
+  }
+
+  static StringBuilder appendBytes(StringBuilder sb, byte ba[], int offset, int len, int shownLength) {
+    int length = Math.min(len, shownLength);
+    return DefaultFormatter.appendBytes(sb, ba, offset, length);
   }
 
   public Iterator<Entry<Key,Value>> getScannerIterator() {

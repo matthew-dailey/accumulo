@@ -17,11 +17,9 @@
 package org.apache.accumulo.core.util.format;
 
 import java.util.Map.Entry;
-
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.ColumnVisibility;
-import org.apache.hadoop.io.Text;
 
 public class BinaryFormatter extends DefaultFormatter {
   @Override
@@ -60,19 +58,6 @@ public class BinaryFormatter extends DefaultFormatter {
       appendValue(sb, value, shownLength);
     }
     return sb.toString();
-  }
-
-  public static StringBuilder appendText(StringBuilder sb, Text t, int shownLength) {
-    return appendBytes(sb, t.getBytes(), 0, t.getLength(), shownLength);
-  }
-
-  static StringBuilder appendValue(StringBuilder sb, Value value, int shownLength) {
-    return appendBytes(sb, value.get(), 0, value.get().length, shownLength);
-  }
-
-  static StringBuilder appendBytes(StringBuilder sb, byte ba[], int offset, int len, int shownLength) {
-    int length = Math.min(len, shownLength);
-    return DefaultFormatter.appendBytes(sb, ba, offset, length);
   }
 
 }
