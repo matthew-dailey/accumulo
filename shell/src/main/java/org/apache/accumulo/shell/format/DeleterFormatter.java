@@ -37,7 +37,6 @@ public class DeleterFormatter extends DefaultFormatter {
   private static final Logger log = LoggerFactory.getLogger(DeleterFormatter.class);
   private BatchWriter writer;
   private Shell shellState;
-  private boolean printTimestamps;
   private boolean force;
   private boolean more;
 

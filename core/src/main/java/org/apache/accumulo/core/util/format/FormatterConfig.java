@@ -16,6 +16,11 @@
  */
 package org.apache.accumulo.core.util.format;
 
+import java.text.DateFormat;
+import java.text.FieldPosition;
+import java.text.ParsePosition;
+import java.util.Date;
+
 import com.google.common.base.Preconditions;
 
 /**
@@ -25,15 +30,37 @@ public class FormatterConfig {
 
   private boolean printTimestamps;
   private int shownLength;
+  private DateFormat dateFormat;
+
+  /** Formats with milliseconds since epoch */
+  public static class DefaultDateFormat extends DateFormat {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public StringBuffer format(Date date, StringBuffer toAppendTo, FieldPosition fieldPosition) {
+      toAppendTo.append(Long.toString(date.getTime()));
+      return toAppendTo;
+    }
+
+    @Override
+    public Date parse(String source, ParsePosition pos) {
+      return new Date(Long.parseLong(source));
+    }
+  }
 
   public FormatterConfig() {
     this.setPrintTimestamps(false);
     this.doNotLimitShowLength();
+    this.dateFormat = new DefaultDateFormat();
   }
 
+  /**
+   * Copies most fields, but still points to other.dateFormat.
+   */
   public FormatterConfig(FormatterConfig other) {
     this.printTimestamps = other.printTimestamps;
     this.shownLength = other.shownLength;
+    this.dateFormat = other.dateFormat;
   }
 
   public boolean willPrintTimestamps() {
@@ -68,6 +95,18 @@ public class FormatterConfig {
 
   public FormatterConfig doNotLimitShowLength() {
     this.shownLength = Integer.MAX_VALUE;
+    return this;
+  }
+
+  public DateFormat getDateFormat() {
+    return dateFormat;
+  }
+
+  /**
+   * this.dateFormat points to dateFormat, so it is recommended that you create a new DateFormat when calling this function.
+   */
+  public FormatterConfig setDateFormat(DateFormat dateFormat) {
+    this.dateFormat = dateFormat;
     return this;
   }
 }

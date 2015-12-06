@@ -17,8 +17,11 @@
 package org.apache.accumulo.core.util.format;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 
+import java.text.DateFormat;
 import org.junit.Test;
 
 public class FormatterConfigTest {
@@ -58,4 +61,20 @@ public class FormatterConfigTest {
     config.doNotLimitShowLength();
     assertEquals(false, config.willLimitShowLength());
   }
+
+  @Test
+  public void testGetDateFormat() {
+    FormatterConfig config1 = new FormatterConfig();
+    DateFormat df1 = config1.getDateFormat();
+
+    FormatterConfig config2 = new FormatterConfig();
+    assertNotSame(df1, config2.getDateFormat());
+
+    config2.setDateFormat(df1);
+    assertSame(df1, config2.getDateFormat());
+
+    FormatterConfig configCopy = new FormatterConfig(config1);
+    assertSame(df1, configCopy.getDateFormat());
+  }
+
 }
