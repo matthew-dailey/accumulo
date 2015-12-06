@@ -24,9 +24,12 @@ import java.util.TimeZone;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 
+/**
+ * This class can be replaced by {@link DefaultFormatter} whose FormatterConfig has a DateFormat set to {@link #DATE_FORMAT}.
+ */
+@Deprecated
 public class DateStringFormatter implements Formatter {
   private DefaultFormatter defaultFormatter = new DefaultFormatter();
-  private FormatterConfig config;
 
   public static final String DATE_FORMAT = "yyyy/MM/dd HH:mm:ss.SSS";
   // SimpleDataFormat is not thread safe
@@ -39,7 +42,9 @@ public class DateStringFormatter implements Formatter {
 
   @Override
   public void initialize(Iterable<Entry<Key,Value>> scanner, FormatterConfig config) {
-    defaultFormatter.initialize(scanner, config);
+    FormatterConfig newConfig = new FormatterConfig(config);
+    newConfig.setDateFormat(formatter.get());
+    defaultFormatter.initialize(scanner, newConfig);
   }
 
   @Override
@@ -49,13 +54,7 @@ public class DateStringFormatter implements Formatter {
 
   @Override
   public String next() {
-    DateFormat timestampformat = null;
-
-    if (defaultFormatter.isDoTimestamps()) {
-      timestampformat = formatter.get();
-    }
-
-    return defaultFormatter.next(timestampformat);
+    return defaultFormatter.next();
   }
 
   @Override

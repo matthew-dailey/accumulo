@@ -52,18 +52,8 @@ public class DefaultFormatter implements Formatter {
 
   @Override
   public String next() {
-    DateFormat timestampFormat = null;
-
-    if (config.willPrintTimestamps()) {
-      timestampFormat = config.getDateFormat();
-    }
-
-    return next(timestampFormat);
-  }
-
-  protected String next(DateFormat timestampFormat) {
     checkState(true);
-    return formatEntry(si.next(), timestampFormat);
+    return formatEntry(si.next());
   }
 
   @Override
@@ -133,6 +123,39 @@ public class DefaultFormatter implements Formatter {
     }
 
     return sb.toString();
+  }
+
+  public String formatEntry(Entry<Key,Value> entry) {
+    return formatEntry(entry, this.config);
+  }
+
+  public static String formatEntry(Entry<Key,Value> entry, FormatterConfig config) {
+    // originally from BinaryFormatter
+    StringBuilder sb = new StringBuilder();
+    Key key = entry.getKey();
+    Text buffer = new Text();
+
+    final int shownLength = config.getShownLength();
+
+    appendText(sb, key.getRow(buffer), shownLength).append(" ");
+    appendText(sb, key.getColumnFamily(buffer), shownLength).append(":");
+    appendText(sb, key.getColumnQualifier(buffer), shownLength).append(" ");
+    sb.append(new ColumnVisibility(key.getColumnVisibility(buffer)));
+
+    // append timestamp
+    if (config.willPrintTimestamps() && config.getDateFormat() != null) {
+      tmpDate.get().setTime(entry.getKey().getTimestamp());
+      sb.append(" ").append(config.getDateFormat().format(tmpDate.get()));
+    }
+
+    // append value
+    Value value = entry.getValue();
+    if (value != null && value.getSize() > 0) {
+      sb.append("\t");
+      appendValue(sb, value, shownLength);
+    }
+    return sb.toString();
+
   }
 
   static StringBuilder appendText(StringBuilder sb, Text t) {

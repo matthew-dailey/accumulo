@@ -18,9 +18,11 @@ package org.apache.accumulo.core.util.format;
 
 import static org.junit.Assert.assertEquals;
 
+import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Map.Entry;
-
+import java.util.TreeMap;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.apache.hadoop.io.Text;
@@ -59,5 +61,43 @@ public class DefaultFormatterTest {
 
     DefaultFormatter.appendText(sb, new Text(data));
     assertEquals("\\x00\\\\x\\xFF", sb.toString());
+  }
+
+  @Test
+  public void testFormatEntry() {
+    final long timestamp = 123456789;
+    Map<Key,Value> map = new TreeMap<Key,Value>();
+    map.put(new Key("a", "ab", "abc", timestamp), new Value("abcd".getBytes()));
+
+    FormatterConfig config;
+    String answer;
+
+    // no timestamp, no max
+    config = new FormatterConfig();
+    df = new DefaultFormatter();
+    df.initialize(map.entrySet(), config);
+    answer = df.next();
+    assertEquals("a ab:abc []\tabcd", answer);
+
+    // yes timestamp, no max
+    config.setPrintTimestamps(true);
+    df = new DefaultFormatter();
+    df.initialize(map.entrySet(), config);
+    answer = df.next();
+    assertEquals("a ab:abc [] " + timestamp + "\tabcd", answer);
+
+    // yes timestamp, max of 1
+    config.setPrintTimestamps(true).setShownLength(1);
+    df = new DefaultFormatter();
+    df.initialize(map.entrySet(), config);
+    answer = df.next();
+    assertEquals("a a:a [] " + timestamp + "\ta", answer);
+
+    // yes timestamp, no max, new DateFormat
+    config.setPrintTimestamps(true).doNotLimitShowLength().setDateFormat(new SimpleDateFormat("YYYY"));
+    df = new DefaultFormatter();
+    df.initialize(map.entrySet(), config);
+    answer = df.next();
+    assertEquals("a ab:abc [] 1970\tabcd", answer);
   }
 }
