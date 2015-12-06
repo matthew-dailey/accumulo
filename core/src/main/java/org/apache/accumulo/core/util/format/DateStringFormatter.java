@@ -63,6 +63,6 @@ public class DateStringFormatter implements Formatter {
   }
 
   public void setTimeZone(TimeZone zone) {
-    formatter.get().setTimeZone(zone);
+    defaultFormatter.setDateFormatTimeZone(zone);
   }
 }

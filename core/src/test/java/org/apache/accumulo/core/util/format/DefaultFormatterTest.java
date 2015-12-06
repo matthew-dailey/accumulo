@@ -22,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TimeZone;
 import java.util.TreeMap;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
@@ -65,7 +66,7 @@ public class DefaultFormatterTest {
 
   @Test
   public void testFormatEntry() {
-    final long timestamp = 123456789;
+    final long timestamp = 0;
     Map<Key,Value> map = new TreeMap<Key,Value>();
     map.put(new Key("a", "ab", "abc", timestamp), new Value("abcd".getBytes()));
 
@@ -99,5 +100,19 @@ public class DefaultFormatterTest {
     df.initialize(map.entrySet(), config);
     answer = df.next();
     assertEquals("a ab:abc [] 1970\tabcd", answer);
+
+    // yes timestamp, no max, new DateFormat, different TimeZone
+    config.setPrintTimestamps(true).doNotLimitShowLength().setDateFormat(new SimpleDateFormat("HH"));
+    df = new DefaultFormatter();
+    df.initialize(map.entrySet(), config);
+    df.setDateFormatTimeZone(TimeZone.getTimeZone("UTC"));
+    answer = df.next();
+    assertEquals("a ab:abc [] 00\tabcd", answer);
+
+    df = new DefaultFormatter();
+    df.initialize(map.entrySet(), config);
+    df.setDateFormatTimeZone(TimeZone.getTimeZone("EST"));
+    answer = df.next();
+    assertEquals("a ab:abc [] 19\tabcd", answer);
   }
 }

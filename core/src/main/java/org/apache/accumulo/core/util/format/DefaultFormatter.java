@@ -20,6 +20,7 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.TimeZone;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.ColumnVisibility;
@@ -198,5 +199,10 @@ public class DefaultFormatter implements Formatter {
 
   protected boolean isDoTimestamps() {
     return config.willPrintTimestamps();
+  }
+
+  /** Sets the TimeZone in the underlying FormatterConfig's DateFormat */
+  public void setDateFormatTimeZone(TimeZone zone) {
+    config.getDateFormat().setTimeZone(zone);
   }
 }
