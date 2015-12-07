@@ -23,9 +23,8 @@ import org.apache.accumulo.core.data.Value;
 
 /**
  * This class can be replaced by {@link DefaultFormatter} where FormatterConfig is initialized with a DateFormat set to {@link #DATE_FORMAT}. See
- * {@link ThreadLocalDateFormatGenerator#createSimpleFormatGenerator(String)}.
+ * {@link DateFormatGenerator#createSimpleFormatGenerator(String)}.
  */
-@Deprecated
 public class DateStringFormatter implements Formatter {
   private DefaultFormatter defaultFormatter = new DefaultFormatter();
 
@@ -34,7 +33,7 @@ public class DateStringFormatter implements Formatter {
   @Override
   public void initialize(Iterable<Entry<Key,Value>> scanner, FormatterConfig config) {
     FormatterConfig newConfig = new FormatterConfig(config);
-    newConfig.setDateFormatGenerator(ThreadLocalDateFormatGenerator.createSimpleFormatGenerator(DATE_FORMAT));
+    newConfig.setDateFormatGenerator(DateFormatGenerator.createSimpleFormatGenerator(DATE_FORMAT));
     defaultFormatter.initialize(scanner, newConfig);
   }
 

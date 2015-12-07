@@ -31,7 +31,7 @@ public class DefaultFormatter implements Formatter {
   protected FormatterConfig config;
 
   /** Used as default DateFormat for some static methods */
-  private static final ThreadLocal<DateFormat> formatter = ThreadLocalDateFormatGenerator.createDefaultFormatGenerator();
+  private static final ThreadLocal<DateFormat> formatter = DateFormatGenerator.createDefaultFormatGenerator();
 
   @Override
   public void initialize(Iterable<Entry<Key,Value>> scanner, FormatterConfig config) {

@@ -26,7 +26,6 @@ import org.apache.accumulo.core.util.format.DateFormatGenerator;
 import org.apache.accumulo.core.util.format.DefaultFormatter;
 import org.apache.accumulo.core.util.format.Formatter;
 import org.apache.accumulo.core.util.format.FormatterConfig;
-import org.apache.accumulo.core.util.format.ThreadLocalDateFormatGenerator;
 import org.apache.accumulo.tracer.thrift.Annotation;
 import org.apache.accumulo.tracer.thrift.RemoteSpan;
 import org.apache.commons.lang.NotImplementedException;
@@ -42,7 +41,7 @@ import org.apache.thrift.transport.TMemoryInputTransport;
 public class TraceFormatter implements Formatter {
   public static final String DATE_FORMAT = "yyyy/MM/dd HH:mm:ss.SSS";
   // ugh... SimpleDataFormat is not thread safe
-  private static final DateFormatGenerator formatter = ThreadLocalDateFormatGenerator.createSimpleFormatGenerator(DATE_FORMAT);
+  private static final DateFormatGenerator formatter = DateFormatGenerator.createSimpleFormatGenerator(DATE_FORMAT);
 
   public static String formatDate(final Date date) {
     return formatter.get().format(date);

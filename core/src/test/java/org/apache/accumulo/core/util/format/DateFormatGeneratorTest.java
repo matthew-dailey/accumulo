@@ -26,7 +26,7 @@ import java.util.Date;
 import java.util.TimeZone;
 import org.junit.Test;
 
-public class ThreadLocalDateFormatGeneratorTest {
+public class DateFormatGeneratorTest {
 
   /** Asserts two generator instance create independent objects */
   private void assertGeneratorsIndependent(ThreadLocal<DateFormat> generatorA, ThreadLocal<DateFormat> generatorB) {
@@ -43,16 +43,16 @@ public class ThreadLocalDateFormatGeneratorTest {
 
   @Test
   public void testCreateDefaultFormatGenerator() throws Exception {
-    ThreadLocal<DateFormat> generatorA = ThreadLocalDateFormatGenerator.createDefaultFormatGenerator();
-    ThreadLocal<DateFormat> generatorB = ThreadLocalDateFormatGenerator.createDefaultFormatGenerator();
+    ThreadLocal<DateFormat> generatorA = DateFormatGenerator.createDefaultFormatGenerator();
+    ThreadLocal<DateFormat> generatorB = DateFormatGenerator.createDefaultFormatGenerator();
     assertGeneratorsIndependent(generatorA, generatorB);
   }
 
   @Test
   public void testCreateSimpleFormatGenerator() throws Exception {
-    final String format = ThreadLocalDateFormatGenerator.HUMAN_READABLE_FORMAT;
-    DateFormatGenerator generatorA = ThreadLocalDateFormatGenerator.createSimpleFormatGenerator(format);
-    DateFormatGenerator generatorB = ThreadLocalDateFormatGenerator.createSimpleFormatGenerator(format);
+    final String format = DateFormatGenerator.HUMAN_READABLE_FORMAT;
+    DateFormatGenerator generatorA = DateFormatGenerator.createSimpleFormatGenerator(format);
+    DateFormatGenerator generatorB = DateFormatGenerator.createSimpleFormatGenerator(format);
     assertGeneratorsIndependent(generatorA, generatorB);
 
     // since dfA and dfB come from different generators, altering the TimeZone on one does not affect the other

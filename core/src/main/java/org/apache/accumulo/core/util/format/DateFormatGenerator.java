@@ -17,10 +17,18 @@
 package org.apache.accumulo.core.util.format;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
 /**
- * DateFormatGenerator is a {@code ThreadLocal<Date>Format} that will set the correct TimeZone when the object is retrieved.
+ * DateFormatGenerator is a {@code ThreadLocal<DateFormat>} that will set the correct TimeZone when the object is retrieved by {@link #get()}.
+ *
+ * This exists as a way to get around thread safety issues in {@link DateFormat}. This class also contains helper methods that create some useful
+ * DateFormatGenerators.
+ *
+ * Instances of DateFormatGenerators can be shared, but note that a DateFormat generated from it will be shared by all classes within a Thread.
+ *
+ * In general, the state of a retrieved DateFormat should not be changed, unless it makes sense to only perform a state change within that Thread.
  */
 public abstract class DateFormatGenerator extends ThreadLocal<DateFormat> {
   private TimeZone timeZone;
@@ -47,5 +55,29 @@ public abstract class DateFormatGenerator extends ThreadLocal<DateFormat> {
     final DateFormat df = super.get();
     df.setTimeZone(timeZone);
     return df;
+  }
+
+  public static final String HUMAN_READABLE_FORMAT = "yyyy/MM/dd HH:mm:ss.SSS";
+
+  /**
+   * Create a generator for {@link FormatterConfig.DefaultDateFormat}s
+   */
+  public static DateFormatGenerator createDefaultFormatGenerator() {
+    return new DateFormatGenerator() {
+      @Override
+      protected DateFormat initialValue() {
+        return new FormatterConfig.DefaultDateFormat();
+      }
+    };
+  }
+
+  /** Create a generator for SimpleDateFormats accepting a dateFormat */
+  public static DateFormatGenerator createSimpleFormatGenerator(final String dateFormat) {
+    return new DateFormatGenerator() {
+      @Override
+      protected SimpleDateFormat initialValue() {
+        return new SimpleDateFormat(dateFormat);
+      }
+    };
   }
 }

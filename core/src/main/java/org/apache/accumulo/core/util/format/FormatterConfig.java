@@ -51,7 +51,7 @@ public class FormatterConfig {
   public FormatterConfig() {
     this.setPrintTimestamps(false);
     this.doNotLimitShowLength();
-    this.dateFormatGenerator = ThreadLocalDateFormatGenerator.createDefaultFormatGenerator();
+    this.dateFormatGenerator = DateFormatGenerator.createDefaultFormatGenerator();
   }
 
   /**

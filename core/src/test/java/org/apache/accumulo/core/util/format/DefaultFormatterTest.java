@@ -94,14 +94,14 @@ public class DefaultFormatterTest {
     assertEquals("a a:a [] " + timestamp + "\ta", answer);
 
     // yes timestamp, no max, new DateFormat
-    config.setPrintTimestamps(true).doNotLimitShowLength().setDateFormatGenerator(ThreadLocalDateFormatGenerator.createSimpleFormatGenerator("YYYY"));
+    config.setPrintTimestamps(true).doNotLimitShowLength().setDateFormatGenerator(DateFormatGenerator.createSimpleFormatGenerator("YYYY"));
     df = new DefaultFormatter();
     df.initialize(map.entrySet(), config);
     answer = df.next();
     assertEquals("a ab:abc [] 1970\tabcd", answer);
 
     // yes timestamp, no max, new DateFormat, different TimeZone
-    config.setPrintTimestamps(true).doNotLimitShowLength().setDateFormatGenerator(ThreadLocalDateFormatGenerator.createSimpleFormatGenerator("HH"));
+    config.setPrintTimestamps(true).doNotLimitShowLength().setDateFormatGenerator(DateFormatGenerator.createSimpleFormatGenerator("HH"));
     df = new DefaultFormatter();
     df.initialize(map.entrySet(), config);
     df.setDateFormatTimeZone(TimeZone.getTimeZone("UTC"));
