@@ -22,7 +22,8 @@ import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 
 /**
- * This class can be replaced by {@link DefaultFormatter} whose FormatterConfig has a DateFormat set to {@link #DATE_FORMAT}.
+ * This class can be replaced by {@link DefaultFormatter} where FormatterConfig is initialized with a DateFormat set to {@link #DATE_FORMAT}.
+ * See {@link ThreadLocalDateFormatGenerator#createSimpleFormatGenerator(String)}.
  */
 @Deprecated
 public class DateStringFormatter implements Formatter {

@@ -22,6 +22,7 @@ import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.ColumnVisibility;
 
 public class BinaryFormatter extends DefaultFormatter {
+  // this class can probably be replaced by DefaultFormatter since DefaultFormatter has the max length stuff
   @Override
   public String next() {
     checkState(true);

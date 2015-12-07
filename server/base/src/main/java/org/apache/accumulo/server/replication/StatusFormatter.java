@@ -31,7 +31,6 @@ import org.apache.accumulo.core.replication.ReplicationSchema.StatusSection;
 import org.apache.accumulo.core.replication.ReplicationSchema.WorkSection;
 import org.apache.accumulo.core.security.ColumnVisibility;
 import org.apache.accumulo.core.util.format.DefaultFormatter;
-import org.apache.accumulo.core.util.format.DefaultFormatter.DefaultDateFormat;
 import org.apache.accumulo.core.util.format.Formatter;
 import org.apache.accumulo.core.util.format.FormatterConfig;
 import org.apache.accumulo.server.replication.proto.Replication.Status;
@@ -62,13 +61,6 @@ public class StatusFormatter implements Formatter {
     }
   };
 
-  private static final ThreadLocal<DateFormat> formatter = new ThreadLocal<DateFormat>() {
-    @Override
-    protected DateFormat initialValue() {
-      return new DefaultDateFormat();
-    }
-  };
-
   @Override
   public boolean hasNext() {
     return iterator.hasNext();
@@ -77,7 +69,7 @@ public class StatusFormatter implements Formatter {
   @Override
   public String next() {
     Entry<Key,Value> entry = iterator.next();
-    DateFormat timestampFormat = config.willPrintTimestamps() ? formatter.get() : null;
+    DateFormat timestampFormat = config.willPrintTimestamps() ? config.getDateFormatGenerator().get() : null;
 
     // If we expected this to be a protobuf, try to parse it, adding a message when it fails to parse
     if (REPLICATION_COLFAMS.contains(entry.getKey().getColumnFamily())) {
@@ -159,7 +151,7 @@ public class StatusFormatter implements Formatter {
   @Override
   public void initialize(Iterable<Entry<Key,Value>> scanner, FormatterConfig config) {
     this.iterator = scanner.iterator();
-    this.config = config;
+    this.config = new FormatterConfig(config);
   }
 
 }

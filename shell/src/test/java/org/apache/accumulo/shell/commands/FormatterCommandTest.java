@@ -184,7 +184,7 @@ public class FormatterCommandTest {
     @Override
     public void initialize(final Iterable<Entry<Key,Value>> scanner, final FormatterConfig config) {
       this.iter = scanner.iterator();
-      this.config = config;
+      this.config = new FormatterConfig(config);
     }
   }
 

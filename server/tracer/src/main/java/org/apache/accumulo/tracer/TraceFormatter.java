@@ -22,9 +22,11 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
+import org.apache.accumulo.core.util.format.DateFormatGenerator;
 import org.apache.accumulo.core.util.format.DefaultFormatter;
 import org.apache.accumulo.core.util.format.Formatter;
 import org.apache.accumulo.core.util.format.FormatterConfig;
+import org.apache.accumulo.core.util.format.ThreadLocalDateFormatGenerator;
 import org.apache.accumulo.tracer.thrift.Annotation;
 import org.apache.accumulo.tracer.thrift.RemoteSpan;
 import org.apache.commons.lang.NotImplementedException;
@@ -40,12 +42,7 @@ import org.apache.thrift.transport.TMemoryInputTransport;
 public class TraceFormatter implements Formatter {
   public static final String DATE_FORMAT = "yyyy/MM/dd HH:mm:ss.SSS";
   // ugh... SimpleDataFormat is not thread safe
-  private static final ThreadLocal<SimpleDateFormat> formatter = new ThreadLocal<SimpleDateFormat>() {
-    @Override
-    protected SimpleDateFormat initialValue() {
-      return new SimpleDateFormat(DATE_FORMAT);
-    }
-  };
+  private static final DateFormatGenerator formatter = ThreadLocalDateFormatGenerator.createSimpleFormatGenerator(DATE_FORMAT);
 
   public static String formatDate(final Date date) {
     return formatter.get().format(date);
@@ -115,6 +112,6 @@ public class TraceFormatter implements Formatter {
   @Override
   public void initialize(Iterable<Entry<Key,Value>> scanner, FormatterConfig config) {
     this.scanner = scanner.iterator();
-    this.config = config;
+    this.config = new FormatterConfig(config);
   }
 }
