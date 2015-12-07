@@ -51,16 +51,16 @@ public class ThreadLocalDateFormatGeneratorTest {
   @Test
   public void testCreateSimpleFormatGenerator() throws Exception {
     final String format = ThreadLocalDateFormatGenerator.HUMAN_READABLE_FORMAT;
-    ThreadLocal<DateFormat> generatorA = ThreadLocalDateFormatGenerator.createSimpleFormatGenerator(format);
-    ThreadLocal<DateFormat> generatorB = ThreadLocalDateFormatGenerator.createSimpleFormatGenerator(format);
+    DateFormatGenerator generatorA = ThreadLocalDateFormatGenerator.createSimpleFormatGenerator(format);
+    DateFormatGenerator generatorB = ThreadLocalDateFormatGenerator.createSimpleFormatGenerator(format);
     assertGeneratorsIndependent(generatorA, generatorB);
 
     // since dfA and dfB come from different generators, altering the TimeZone on one does not affect the other
+    generatorA.setTimeZone(TimeZone.getTimeZone("UTC"));
     final DateFormat dfA = generatorA.get();
-    dfA.setTimeZone(TimeZone.getTimeZone("UTC"));
 
+    generatorB.setTimeZone(TimeZone.getTimeZone("EST"));
     final DateFormat dfB = generatorB.get();
-    dfB.setTimeZone(TimeZone.getTimeZone("EST"));
 
     final String resultA = dfA.format(new Date(0));
     assertEquals("1970/01/01 00:00:00.000", resultA);

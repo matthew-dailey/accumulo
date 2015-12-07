@@ -31,8 +31,8 @@ public class ThreadLocalDateFormatGenerator {
   /**
    * Create a generator for {@link org.apache.accumulo.core.util.format.FormatterConfig.DefaultDateFormat}s
    */
-  public static ThreadLocal<DateFormat> createDefaultFormatGenerator() {
-    return new ThreadLocal<DateFormat>() {
+  public static DateFormatGenerator createDefaultFormatGenerator() {
+    return new DateFormatGenerator() {
       @Override
       protected DateFormat initialValue() {
         return new FormatterConfig.DefaultDateFormat();
@@ -43,8 +43,8 @@ public class ThreadLocalDateFormatGenerator {
   public static final String HUMAN_READABLE_FORMAT = "yyyy/MM/dd HH:mm:ss.SSS";
 
   /** Create a generator for SimpleDateFormats accepting a dateFormat */
-  public static ThreadLocal<DateFormat> createSimpleFormatGenerator(final String dateFormat) {
-    return new ThreadLocal<DateFormat>() {
+  public static DateFormatGenerator createSimpleFormatGenerator(final String dateFormat) {
+    return new DateFormatGenerator() {
       @Override
       protected SimpleDateFormat initialValue() {
         return new SimpleDateFormat(dateFormat);

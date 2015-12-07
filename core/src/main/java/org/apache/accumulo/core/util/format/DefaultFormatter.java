@@ -31,12 +31,7 @@ public class DefaultFormatter implements Formatter {
   protected FormatterConfig config;
 
   /** Used as default DateFormat for some static methods */
-  private static final ThreadLocal<DateFormat> formatter = new ThreadLocal<DateFormat>() {
-    @Override
-    protected DateFormat initialValue() {
-      return new FormatterConfig.DefaultDateFormat();
-    }
-  };
+  private static final ThreadLocal<DateFormat> formatter = ThreadLocalDateFormatGenerator.createDefaultFormatGenerator();
 
   @Override
   public void initialize(Iterable<Entry<Key,Value>> scanner, FormatterConfig config) {
@@ -144,9 +139,9 @@ public class DefaultFormatter implements Formatter {
     sb.append(new ColumnVisibility(key.getColumnVisibility(buffer)));
 
     // append timestamp
-    if (config.willPrintTimestamps() && config.getDateFormat() != null) {
+    if (config.willPrintTimestamps() && config.getDateFormatGenerator() != null) {
       tmpDate.get().setTime(entry.getKey().getTimestamp());
-      sb.append(" ").append(config.getDateFormat().format(tmpDate.get()));
+      sb.append(" ").append(config.getDateFormatGenerator().get().format(tmpDate.get()));
     }
 
     // append value
@@ -201,8 +196,10 @@ public class DefaultFormatter implements Formatter {
     return config.willPrintTimestamps();
   }
 
-  /** Sets the TimeZone in the underlying FormatterConfig's DateFormat */
+  /**
+   * Sets the TimeZone in the underlying FormatterConfig's {@link DateFormatGenerator}
+   */
   public void setDateFormatTimeZone(TimeZone zone) {
-    config.getDateFormat().setTimeZone(zone);
+    config.getDateFormatGenerator().setTimeZone(zone);
   }
 }

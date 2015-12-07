@@ -18,7 +18,6 @@ package org.apache.accumulo.core.util.format;
 
 import static org.junit.Assert.assertEquals;
 
-import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -95,14 +94,14 @@ public class DefaultFormatterTest {
     assertEquals("a a:a [] " + timestamp + "\ta", answer);
 
     // yes timestamp, no max, new DateFormat
-    config.setPrintTimestamps(true).doNotLimitShowLength().setDateFormat(new SimpleDateFormat("YYYY"));
+    config.setPrintTimestamps(true).doNotLimitShowLength().setDateFormatGenerator(ThreadLocalDateFormatGenerator.createSimpleFormatGenerator("YYYY"));
     df = new DefaultFormatter();
     df.initialize(map.entrySet(), config);
     answer = df.next();
     assertEquals("a ab:abc [] 1970\tabcd", answer);
 
     // yes timestamp, no max, new DateFormat, different TimeZone
-    config.setPrintTimestamps(true).doNotLimitShowLength().setDateFormat(new SimpleDateFormat("HH"));
+    config.setPrintTimestamps(true).doNotLimitShowLength().setDateFormatGenerator(ThreadLocalDateFormatGenerator.createSimpleFormatGenerator("HH"));
     df = new DefaultFormatter();
     df.initialize(map.entrySet(), config);
     df.setDateFormatTimeZone(TimeZone.getTimeZone("UTC"));
