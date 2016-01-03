@@ -22,7 +22,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.TreeMap;
-
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.junit.Before;
@@ -42,11 +41,16 @@ public class DateStringFormatterTest {
 
   @Test
   public void testTimestamps() {
-    formatter.initialize(data.entrySet(), new FormatterConfig().setPrintTimestamps(true));
-    formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+    final DateFormatGenerator dfSupplier = DateFormatGenerator.createSimpleFormatGenerator(DateFormatGenerator.HUMAN_READABLE_FORMAT,
+        TimeZone.getTimeZone("UTC"));
+    final FormatterConfig config = new FormatterConfig().setPrintTimestamps(true).setDateFormatSupplier(dfSupplier);
+
+    Formatter formatter = new DefaultFormatter();
+    formatter.initialize(data.entrySet(), config);
 
     assertTrue(formatter.hasNext());
-    assertTrue(formatter.next().endsWith("1970/01/01 00:00:00.000"));
+    final String next = formatter.next();
+    assertTrue(next, next.endsWith("1970/01/01 00:00:00.000"));
   }
 
   @Test

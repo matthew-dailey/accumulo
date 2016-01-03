@@ -16,12 +16,14 @@
  */
 package org.apache.accumulo.core.util.format;
 
+import java.text.DateFormat;
 import java.text.FieldPosition;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Supplier;
 
 /**
  * Holds configuration settings for a {@link Formatter}
@@ -30,7 +32,7 @@ public class FormatterConfig {
 
   private boolean printTimestamps;
   private int shownLength;
-  private DateFormatGenerator dateFormatGenerator;
+  private Supplier<DateFormat> dateFormatSupplier;
 
   /** Formats with milliseconds since epoch */
   public static class DefaultDateFormat extends SimpleDateFormat {
@@ -51,16 +53,16 @@ public class FormatterConfig {
   public FormatterConfig() {
     this.setPrintTimestamps(false);
     this.doNotLimitShowLength();
-    this.dateFormatGenerator = DateFormatGenerator.createDefaultFormatGenerator();
+    this.dateFormatSupplier = DateFormatGenerator.createDefaultFormatGenerator();
   }
 
   /**
-   * Copies most fields, but still points to other.dateFormatGenerator.
+   * Copies most fields, but still points to other.dateFormatSupplier.
    */
   public FormatterConfig(FormatterConfig other) {
     this.printTimestamps = other.printTimestamps;
     this.shownLength = other.shownLength;
-    this.dateFormatGenerator = other.dateFormatGenerator;
+    this.dateFormatSupplier = other.dateFormatSupplier;
   }
 
   public boolean willPrintTimestamps() {
@@ -98,16 +100,16 @@ public class FormatterConfig {
     return this;
   }
 
-  public DateFormatGenerator getDateFormatGenerator() {
-    return dateFormatGenerator;
+  public Supplier<DateFormat> getDateFormatSupplier() {
+    return dateFormatSupplier;
   }
 
   /**
-   * this.dateFormatGenerator points to dateFormatGenerator, so it is recommended that you create a new {@code DateFormatGenerator} when calling this function
-   * (see {@link ThreadLocalDateFormatGenerator}..
+   * this.dateFormatSupplier points to dateFormatSupplier, so it is recommended that you create a new {@code Supplier} when calling this function if your
+   * {@code Supplier} maintains some kind of state (see {@link DateFormatGenerator}.
    */
-  public FormatterConfig setDateFormatGenerator(DateFormatGenerator dateFormatGenerator) {
-    this.dateFormatGenerator = dateFormatGenerator;
+  public FormatterConfig setDateFormatSupplier(Supplier<DateFormat> dateFormatSupplier) {
+    this.dateFormatSupplier = dateFormatSupplier;
     return this;
   }
 }

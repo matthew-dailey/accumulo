@@ -20,7 +20,6 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map.Entry;
-import java.util.TimeZone;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.ColumnVisibility;
@@ -66,7 +65,8 @@ public class DefaultFormatter implements Formatter {
   }
 
   /**
-   * if showTimestamps, will use {@link org.apache.accumulo.core.util.format.FormatterConfig.DefaultDateFormat}
+   * if showTimestamps, will use {@link org.apache.accumulo.core.util.format.FormatterConfig.DefaultDateFormat}. Preferably, use
+   * {@link #formatEntry(Entry, FormatterConfig)}
    */
   public static String formatEntry(Entry<Key,Value> entry, boolean showTimestamps) {
     DateFormat timestampFormat = null;
@@ -139,9 +139,9 @@ public class DefaultFormatter implements Formatter {
     sb.append(new ColumnVisibility(key.getColumnVisibility(buffer)));
 
     // append timestamp
-    if (config.willPrintTimestamps() && config.getDateFormatGenerator() != null) {
+    if (config.willPrintTimestamps() && config.getDateFormatSupplier() != null) {
       tmpDate.get().setTime(entry.getKey().getTimestamp());
-      sb.append(" ").append(config.getDateFormatGenerator().get().format(tmpDate.get()));
+      sb.append(" ").append(config.getDateFormatSupplier().get().format(tmpDate.get()));
     }
 
     // append value
@@ -196,10 +196,4 @@ public class DefaultFormatter implements Formatter {
     return config.willPrintTimestamps();
   }
 
-  /**
-   * Sets the TimeZone in the underlying FormatterConfig's {@link DateFormatGenerator}
-   */
-  public void setDateFormatTimeZone(TimeZone zone) {
-    config.getDateFormatGenerator().setTimeZone(zone);
-  }
 }

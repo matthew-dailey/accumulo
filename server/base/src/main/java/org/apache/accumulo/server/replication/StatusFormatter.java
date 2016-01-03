@@ -69,7 +69,7 @@ public class StatusFormatter implements Formatter {
   @Override
   public String next() {
     Entry<Key,Value> entry = iterator.next();
-    DateFormat timestampFormat = config.willPrintTimestamps() ? config.getDateFormatGenerator().get() : null;
+    DateFormat timestampFormat = config.willPrintTimestamps() ? config.getDateFormatSupplier().get() : null;
 
     // If we expected this to be a protobuf, try to parse it, adding a message when it fails to parse
     if (REPLICATION_COLFAMS.contains(entry.getKey().getColumnFamily())) {

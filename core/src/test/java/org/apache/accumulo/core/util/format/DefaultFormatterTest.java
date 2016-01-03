@@ -31,6 +31,8 @@ import org.junit.Test;
 
 public class DefaultFormatterTest {
 
+  public static final TimeZone UTC = TimeZone.getTimeZone("UTC");
+  public static final TimeZone EST = TimeZone.getTimeZone("EST");
   DefaultFormatter df;
   Iterable<Entry<Key,Value>> empty = Collections.<Key,Value> emptyMap().entrySet();
 
@@ -94,23 +96,22 @@ public class DefaultFormatterTest {
     assertEquals("a a:a [] " + timestamp + "\ta", answer);
 
     // yes timestamp, no max, new DateFormat
-    config.setPrintTimestamps(true).doNotLimitShowLength().setDateFormatGenerator(DateFormatGenerator.createSimpleFormatGenerator("YYYY"));
+    config.setPrintTimestamps(true).doNotLimitShowLength().setDateFormatSupplier(DateFormatGenerator.createSimpleFormatGenerator("YYYY"));
     df = new DefaultFormatter();
     df.initialize(map.entrySet(), config);
     answer = df.next();
     assertEquals("a ab:abc [] 1970\tabcd", answer);
 
     // yes timestamp, no max, new DateFormat, different TimeZone
-    config.setPrintTimestamps(true).doNotLimitShowLength().setDateFormatGenerator(DateFormatGenerator.createSimpleFormatGenerator("HH"));
+    config.setPrintTimestamps(true).doNotLimitShowLength().setDateFormatSupplier(DateFormatGenerator.createSimpleFormatGenerator("HH", UTC));
     df = new DefaultFormatter();
     df.initialize(map.entrySet(), config);
-    df.setDateFormatTimeZone(TimeZone.getTimeZone("UTC"));
     answer = df.next();
     assertEquals("a ab:abc [] 00\tabcd", answer);
 
+    config.setPrintTimestamps(true).doNotLimitShowLength().setDateFormatSupplier(DateFormatGenerator.createSimpleFormatGenerator("HH", EST));
     df = new DefaultFormatter();
     df.initialize(map.entrySet(), config);
-    df.setDateFormatTimeZone(TimeZone.getTimeZone("EST"));
     answer = df.next();
     assertEquals("a ab:abc [] 19\tabcd", answer);
   }

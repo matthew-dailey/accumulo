@@ -20,6 +20,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
+import com.google.common.base.Supplier;
+
 /**
  * DateFormatGenerator is a {@code ThreadLocal<DateFormat>} that will set the correct TimeZone when the object is retrieved by {@link #get()}.
  *
@@ -30,7 +32,7 @@ import java.util.TimeZone;
  *
  * In general, the state of a retrieved DateFormat should not be changed, unless it makes sense to only perform a state change within that Thread.
  */
-public abstract class DateFormatGenerator extends ThreadLocal<DateFormat> {
+public abstract class DateFormatGenerator extends ThreadLocal<DateFormat> implements Supplier<DateFormat> {
   private TimeZone timeZone;
 
   public DateFormatGenerator() {
@@ -74,6 +76,16 @@ public abstract class DateFormatGenerator extends ThreadLocal<DateFormat> {
   /** Create a generator for SimpleDateFormats accepting a dateFormat */
   public static DateFormatGenerator createSimpleFormatGenerator(final String dateFormat) {
     return new DateFormatGenerator() {
+      @Override
+      protected SimpleDateFormat initialValue() {
+        return new SimpleDateFormat(dateFormat);
+      }
+    };
+  }
+
+  /** Create a generator for SimpleDateFormats accepting a dateFormat */
+  public static DateFormatGenerator createSimpleFormatGenerator(final String dateFormat, final TimeZone timeZone) {
+    return new DateFormatGenerator(timeZone) {
       @Override
       protected SimpleDateFormat initialValue() {
         return new SimpleDateFormat(dateFormat);

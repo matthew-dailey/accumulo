@@ -65,17 +65,17 @@ public class FormatterConfigTest {
   @Test
   public void testGetDateFormat() {
     FormatterConfig config1 = new FormatterConfig();
-    DateFormat df1 = config1.getDateFormatGenerator().get();
+    DateFormat df1 = config1.getDateFormatSupplier().get();
 
     FormatterConfig config2 = new FormatterConfig();
-    assertNotSame(df1, config2.getDateFormatGenerator().get());
+    assertNotSame(df1, config2.getDateFormatSupplier().get());
 
-    config2.setDateFormatGenerator(config1.getDateFormatGenerator());
-    assertSame(df1, config2.getDateFormatGenerator().get());
+    config2.setDateFormatSupplier(config1.getDateFormatSupplier());
+    assertSame(df1, config2.getDateFormatSupplier().get());
 
     // even though copying, it can't copy the Generator, so will pull out the same DateFormat
     FormatterConfig configCopy = new FormatterConfig(config1);
-    assertSame(df1, configCopy.getDateFormatGenerator().get());
+    assertSame(df1, configCopy.getDateFormatSupplier().get());
   }
 
 }
