@@ -39,7 +39,7 @@ import org.apache.thrift.transport.TMemoryInputTransport;
  *
  */
 public class TraceFormatter implements Formatter {
-  public static final String DATE_FORMAT = "yyyy/MM/dd HH:mm:ss.SSS";
+  public static final String DATE_FORMAT = DateFormatSupplier.HUMAN_READABLE_FORMAT;
   // ugh... SimpleDataFormat is not thread safe
   private static final DateFormatSupplier formatter = DateFormatSupplier.createSimpleFormatSupplier(DATE_FORMAT);
 

@@ -177,6 +177,8 @@ public class ShellTest {
     exec("createtable test", true);
     exec("addsplits 1 \\x80", true);
     exec("getsplits", true, "1\n\\x80");
+    exec("getsplits -m 1", true, "1");
+    exec("getsplits -b64", true, "MQ==\ngA==");
     exec("deletetable test -f", true, "Table: [test] has been deleted");
   }
 
