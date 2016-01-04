@@ -39,17 +39,30 @@ public class DateStringFormatterTest {
     data.put(new Key("", "", "", 0), new Value());
   }
 
-  @Test
-  public void testTimestamps() {
-    final DateFormatSupplier dfSupplier = DateFormatSupplier.createSimpleFormatSupplier(DateFormatSupplier.HUMAN_READABLE_FORMAT, TimeZone.getTimeZone("UTC"));
-    final FormatterConfig config = new FormatterConfig().setPrintTimestamps(true).setDateFormatSupplier(dfSupplier);
-
-    Formatter formatter = new DefaultFormatter();
+  private void testFormatterIgnoresConfig(FormatterConfig config, DateStringFormatter formatter) {
+    // ignores config's DateFormatSupplier and substitutes its own
     formatter.initialize(data.entrySet(), config);
 
     assertTrue(formatter.hasNext());
     final String next = formatter.next();
     assertTrue(next, next.endsWith("1970/01/01 00:00:00.000"));
+  }
+
+  @Test
+  public void testTimestamps() {
+    final TimeZone utc = TimeZone.getTimeZone("UTC");
+    final TimeZone est = TimeZone.getTimeZone("EST");
+    final FormatterConfig config = new FormatterConfig().setPrintTimestamps(true);
+    DateStringFormatter formatter;
+
+    formatter = new DateStringFormatter(utc);
+    testFormatterIgnoresConfig(config, formatter);
+
+    // even though config says to use EST and only print year, the Formatter will override these
+    formatter = new DateStringFormatter(utc);
+    DateFormatSupplier dfSupplier = DateFormatSupplier.createSimpleFormatSupplier("YYYY", est);
+    config.setDateFormatSupplier(dfSupplier);
+    testFormatterIgnoresConfig(config, formatter);
   }
 
   @Test
