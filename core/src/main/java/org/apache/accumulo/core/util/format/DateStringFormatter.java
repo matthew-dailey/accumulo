@@ -21,13 +21,13 @@ import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 
 /**
- * This class is <strong>NOT</strong> recommended because it does not respect {@link java.util.TimeZone}.
+ * This class is <strong>not</strong> recommended because it does not respect {@link java.util.TimeZone}.
  *
  * This class can be replaced by {@link DefaultFormatter} where FormatterConfig is initialized with a DateFormat set to {@link #DATE_FORMAT}. See
- * {@link DateFormatGenerator#createSimpleFormatGenerator(String)}.
+ * {@link DateFormatSupplier#createSimpleFormatSupplier(String, java.util.TimeZone)}.
  *
  * <pre>
- * final DateFormatGenerator dfSupplier = DateFormatGenerator.createSimpleFormatGenerator(DateFormatGenerator.HUMAN_READABLE_FORMAT, TimeZone.getTimeZone(&quot;UTC&quot;));
+ * final DateFormatSupplier dfSupplier = DateFormatSupplier.createSimpleFormatSupplier(DateFormatSupplier.HUMAN_READABLE_FORMAT, TimeZone.getTimeZone(&quot;UTC&quot;));
  * final FormatterConfig config = new FormatterConfig().setPrintTimestamps(true).setDateFormatSupplier(dfSupplier);
  * </pre>
  */
@@ -35,12 +35,12 @@ public class DateStringFormatter implements Formatter {
 
   private DefaultFormatter defaultFormatter = new DefaultFormatter();
 
-  public static final String DATE_FORMAT = "yyyy/MM/dd HH:mm:ss.SSS";
+  public static final String DATE_FORMAT = DateFormatSupplier.HUMAN_READABLE_FORMAT;
 
   @Override
   public void initialize(Iterable<Entry<Key,Value>> scanner, FormatterConfig config) {
     FormatterConfig newConfig = new FormatterConfig(config);
-    newConfig.setDateFormatSupplier(DateFormatGenerator.createSimpleFormatGenerator(DATE_FORMAT));
+    newConfig.setDateFormatSupplier(DateFormatSupplier.createSimpleFormatSupplier(DATE_FORMAT));
     defaultFormatter.initialize(scanner, newConfig);
   }
 

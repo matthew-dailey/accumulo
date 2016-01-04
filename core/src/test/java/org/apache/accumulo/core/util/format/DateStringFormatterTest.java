@@ -41,8 +41,7 @@ public class DateStringFormatterTest {
 
   @Test
   public void testTimestamps() {
-    final DateFormatGenerator dfSupplier = DateFormatGenerator.createSimpleFormatGenerator(DateFormatGenerator.HUMAN_READABLE_FORMAT,
-        TimeZone.getTimeZone("UTC"));
+    final DateFormatSupplier dfSupplier = DateFormatSupplier.createSimpleFormatSupplier(DateFormatSupplier.HUMAN_READABLE_FORMAT, TimeZone.getTimeZone("UTC"));
     final FormatterConfig config = new FormatterConfig().setPrintTimestamps(true).setDateFormatSupplier(dfSupplier);
 
     Formatter formatter = new DefaultFormatter();

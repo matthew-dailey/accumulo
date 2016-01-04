@@ -26,41 +26,41 @@ import java.util.Date;
 import java.util.TimeZone;
 import org.junit.Test;
 
-public class DateFormatGeneratorTest {
+public class DateFormatSupplierTest {
 
-  /** Asserts two generator instance create independent objects */
-  private void assertGeneratorsIndependent(ThreadLocal<DateFormat> generatorA, ThreadLocal<DateFormat> generatorB) {
-    DateFormat getA1 = generatorA.get();
-    DateFormat getA2 = generatorA.get();
+  /** Asserts two supplier instance create independent objects */
+  private void assertSuppliersIndependent(ThreadLocal<DateFormat> supplierA, ThreadLocal<DateFormat> supplierB) {
+    DateFormat getA1 = supplierA.get();
+    DateFormat getA2 = supplierA.get();
     assertSame(getA1, getA2);
 
-    DateFormat getB1 = generatorB.get();
-    DateFormat getB2 = generatorB.get();
+    DateFormat getB1 = supplierB.get();
+    DateFormat getB2 = supplierB.get();
 
     assertSame(getB1, getB2);
     assertNotSame(getA1, getB1);
   }
 
   @Test
-  public void testCreateDefaultFormatGenerator() throws Exception {
-    ThreadLocal<DateFormat> generatorA = DateFormatGenerator.createDefaultFormatGenerator();
-    ThreadLocal<DateFormat> generatorB = DateFormatGenerator.createDefaultFormatGenerator();
-    assertGeneratorsIndependent(generatorA, generatorB);
+  public void testCreateDefaultFormatSupplier() throws Exception {
+    ThreadLocal<DateFormat> supplierA = DateFormatSupplier.createDefaultFormatSupplier();
+    ThreadLocal<DateFormat> supplierB = DateFormatSupplier.createDefaultFormatSupplier();
+    assertSuppliersIndependent(supplierA, supplierB);
   }
 
   @Test
-  public void testCreateSimpleFormatGenerator() throws Exception {
-    final String format = DateFormatGenerator.HUMAN_READABLE_FORMAT;
-    DateFormatGenerator generatorA = DateFormatGenerator.createSimpleFormatGenerator(format);
-    DateFormatGenerator generatorB = DateFormatGenerator.createSimpleFormatGenerator(format);
-    assertGeneratorsIndependent(generatorA, generatorB);
+  public void testCreateSimpleFormatSupplier() throws Exception {
+    final String format = DateFormatSupplier.HUMAN_READABLE_FORMAT;
+    DateFormatSupplier supplierA = DateFormatSupplier.createSimpleFormatSupplier(format);
+    DateFormatSupplier supplierB = DateFormatSupplier.createSimpleFormatSupplier(format);
+    assertSuppliersIndependent(supplierA, supplierB);
 
-    // since dfA and dfB come from different generators, altering the TimeZone on one does not affect the other
-    generatorA.setTimeZone(TimeZone.getTimeZone("UTC"));
-    final DateFormat dfA = generatorA.get();
+    // since dfA and dfB come from different suppliers, altering the TimeZone on one does not affect the other
+    supplierA.setTimeZone(TimeZone.getTimeZone("UTC"));
+    final DateFormat dfA = supplierA.get();
 
-    generatorB.setTimeZone(TimeZone.getTimeZone("EST"));
-    final DateFormat dfB = generatorB.get();
+    supplierB.setTimeZone(TimeZone.getTimeZone("EST"));
+    final DateFormat dfB = supplierB.get();
 
     final String resultA = dfA.format(new Date(0));
     assertEquals("1970/01/01 00:00:00.000", resultA);

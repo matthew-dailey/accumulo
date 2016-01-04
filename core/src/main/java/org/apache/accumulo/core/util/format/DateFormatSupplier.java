@@ -23,23 +23,23 @@ import java.util.TimeZone;
 import com.google.common.base.Supplier;
 
 /**
- * DateFormatGenerator is a {@code ThreadLocal<DateFormat>} that will set the correct TimeZone when the object is retrieved by {@link #get()}.
+ * DateFormatSupplier is a {@code ThreadLocal<DateFormat>} that will set the correct TimeZone when the object is retrieved by {@link #get()}.
  *
  * This exists as a way to get around thread safety issues in {@link DateFormat}. This class also contains helper methods that create some useful
- * DateFormatGenerators.
+ * DateFormatSuppliers.
  *
- * Instances of DateFormatGenerators can be shared, but note that a DateFormat generated from it will be shared by all classes within a Thread.
+ * Instances of DateFormatSuppliers can be shared, but note that a DateFormat generated from it will be shared by all classes within a Thread.
  *
  * In general, the state of a retrieved DateFormat should not be changed, unless it makes sense to only perform a state change within that Thread.
  */
-public abstract class DateFormatGenerator extends ThreadLocal<DateFormat> implements Supplier<DateFormat> {
+public abstract class DateFormatSupplier extends ThreadLocal<DateFormat> implements Supplier<DateFormat> {
   private TimeZone timeZone;
 
-  public DateFormatGenerator() {
+  public DateFormatSupplier() {
     timeZone = TimeZone.getDefault();
   }
 
-  public DateFormatGenerator(TimeZone timeZone) {
+  public DateFormatSupplier(TimeZone timeZone) {
     this.timeZone = timeZone;
   }
 
@@ -62,10 +62,10 @@ public abstract class DateFormatGenerator extends ThreadLocal<DateFormat> implem
   public static final String HUMAN_READABLE_FORMAT = "yyyy/MM/dd HH:mm:ss.SSS";
 
   /**
-   * Create a generator for {@link FormatterConfig.DefaultDateFormat}s
+   * Create a Supplier for {@link FormatterConfig.DefaultDateFormat}s
    */
-  public static DateFormatGenerator createDefaultFormatGenerator() {
-    return new DateFormatGenerator() {
+  public static DateFormatSupplier createDefaultFormatSupplier() {
+    return new DateFormatSupplier() {
       @Override
       protected DateFormat initialValue() {
         return new FormatterConfig.DefaultDateFormat();
@@ -74,8 +74,8 @@ public abstract class DateFormatGenerator extends ThreadLocal<DateFormat> implem
   }
 
   /** Create a generator for SimpleDateFormats accepting a dateFormat */
-  public static DateFormatGenerator createSimpleFormatGenerator(final String dateFormat) {
-    return new DateFormatGenerator() {
+  public static DateFormatSupplier createSimpleFormatSupplier(final String dateFormat) {
+    return new DateFormatSupplier() {
       @Override
       protected SimpleDateFormat initialValue() {
         return new SimpleDateFormat(dateFormat);
@@ -84,8 +84,8 @@ public abstract class DateFormatGenerator extends ThreadLocal<DateFormat> implem
   }
 
   /** Create a generator for SimpleDateFormats accepting a dateFormat */
-  public static DateFormatGenerator createSimpleFormatGenerator(final String dateFormat, final TimeZone timeZone) {
-    return new DateFormatGenerator(timeZone) {
+  public static DateFormatSupplier createSimpleFormatSupplier(final String dateFormat, final TimeZone timeZone) {
+    return new DateFormatSupplier(timeZone) {
       @Override
       protected SimpleDateFormat initialValue() {
         return new SimpleDateFormat(dateFormat);

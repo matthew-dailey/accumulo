@@ -53,7 +53,7 @@ public class FormatterConfig {
   public FormatterConfig() {
     this.setPrintTimestamps(false);
     this.doNotLimitShowLength();
-    this.dateFormatSupplier = DateFormatGenerator.createDefaultFormatGenerator();
+    this.dateFormatSupplier = DateFormatSupplier.createDefaultFormatSupplier();
   }
 
   /**
@@ -106,7 +106,7 @@ public class FormatterConfig {
 
   /**
    * this.dateFormatSupplier points to dateFormatSupplier, so it is recommended that you create a new {@code Supplier} when calling this function if your
-   * {@code Supplier} maintains some kind of state (see {@link DateFormatGenerator}.
+   * {@code Supplier} maintains some kind of state (see {@link DateFormatSupplier}.
    */
   public FormatterConfig setDateFormatSupplier(Supplier<DateFormat> dateFormatSupplier) {
     this.dateFormatSupplier = dateFormatSupplier;
