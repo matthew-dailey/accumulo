@@ -42,6 +42,10 @@ import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import jline.console.ConsoleReader;
+import jline.console.UserInterruptException;
+import jline.console.history.FileHistory;
+
 import org.apache.accumulo.core.Constants;
 import org.apache.accumulo.core.client.AccumuloException;
 import org.apache.accumulo.core.client.AccumuloSecurityException;
@@ -67,7 +71,6 @@ import org.apache.accumulo.core.data.thrift.TConstraintViolationSummary;
 import org.apache.accumulo.core.tabletserver.thrift.ConstraintViolationException;
 import org.apache.accumulo.core.trace.DistributedTrace;
 import org.apache.accumulo.core.util.BadArgumentException;
-import org.apache.accumulo.core.util.format.BinaryFormatter;
 import org.apache.accumulo.core.util.format.DefaultFormatter;
 import org.apache.accumulo.core.util.format.Formatter;
 import org.apache.accumulo.core.util.format.FormatterConfig;
@@ -179,10 +182,6 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import com.google.auto.service.AutoService;
 
-import jline.console.ConsoleReader;
-import jline.console.UserInterruptException;
-import jline.console.history.FileHistory;
-
 /**
  * A convenient console interface to perform basic accumulo functions Includes auto-complete, help, and quoted strings with escape sequences
  */
@@ -205,7 +204,6 @@ public class Shell extends ShellOptions implements KeywordExecutable {
   protected ConsoleReader reader;
   private AuthenticationToken token;
   private final Class<? extends Formatter> defaultFormatterClass = DefaultFormatter.class;
-  private final Class<? extends Formatter> binaryFormatterClass = BinaryFormatter.class;
   public Map<String,List<IteratorSetting>> scanIteratorOptions = new HashMap<String,List<IteratorSetting>>();
   public Map<String,List<IteratorSetting>> iteratorProfiles = new HashMap<String,List<IteratorSetting>>();
 
@@ -1097,14 +1095,6 @@ public class Shell extends ShellOptions implements KeywordExecutable {
   public final void printRecords(Iterable<Entry<Key,Value>> scanner, FormatterConfig config, boolean paginate, Class<? extends Formatter> formatterClass)
       throws IOException {
     printLines(FormatterFactory.getFormatter(formatterClass, scanner, config), paginate);
-  }
-
-  public final void printBinaryRecords(Iterable<Entry<Key,Value>> scanner, FormatterConfig config, boolean paginate, PrintLine outFile) throws IOException {
-    printLines(FormatterFactory.getFormatter(binaryFormatterClass, scanner, config), paginate, outFile);
-  }
-
-  public final void printBinaryRecords(Iterable<Entry<Key,Value>> scanner, FormatterConfig config, boolean paginate) throws IOException {
-    printLines(FormatterFactory.getFormatter(binaryFormatterClass, scanner, config), paginate);
   }
 
   public static String repeat(String s, int c) {

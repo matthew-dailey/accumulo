@@ -94,16 +94,13 @@ public class ScanCommand extends Command {
       try {
         final int length = Integer.parseInt(showLength);
         config.setShownLength(length);
-        printBinaryRecords(cl, shellState, config, scanner, printFile);
       } catch (NumberFormatException nfe) {
         shellState.getReader().println("Arg must be an integer.");
       } catch (IllegalArgumentException iae) {
         shellState.getReader().println("Arg must be greater than one.");
       }
-
-    } else {
-      printRecords(cl, shellState, config, scanner, formatter, printFile);
     }
+    printRecords(cl, shellState, config, scanner, formatter, printFile);
     if (printFile != null) {
       printFile.close();
     }
@@ -167,15 +164,6 @@ public class ScanCommand extends Command {
       shellState.printRecords(scanner, config, !cl.hasOption(disablePaginationOpt.getOpt()), formatter);
     } else {
       shellState.printRecords(scanner, config, !cl.hasOption(disablePaginationOpt.getOpt()), formatter, outFile);
-    }
-  }
-
-  protected void printBinaryRecords(final CommandLine cl, final Shell shellState, FormatterConfig config, final Iterable<Entry<Key,Value>> scanner,
-      PrintFile outFile) throws IOException {
-    if (outFile == null) {
-      shellState.printBinaryRecords(scanner, config, !cl.hasOption(disablePaginationOpt.getOpt()));
-    } else {
-      shellState.printBinaryRecords(scanner, config, !cl.hasOption(disablePaginationOpt.getOpt()), outFile);
     }
   }
 

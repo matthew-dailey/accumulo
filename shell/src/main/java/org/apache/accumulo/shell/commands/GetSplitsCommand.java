@@ -36,7 +36,7 @@ import org.apache.accumulo.core.metadata.schema.MetadataSchema.TabletsSection;
 import org.apache.accumulo.core.security.Authorizations;
 import org.apache.accumulo.core.util.Base64;
 import org.apache.accumulo.core.util.TextUtil;
-import org.apache.accumulo.core.util.format.BinaryFormatter;
+import org.apache.accumulo.core.util.format.DefaultFormatter;
 import org.apache.accumulo.shell.Shell;
 import org.apache.accumulo.shell.Shell.Command;
 import org.apache.accumulo.shell.Shell.PrintFile;
@@ -103,7 +103,7 @@ public class GetSplitsCommand extends Command {
       return null;
     }
     final int length = text.getLength();
-    return encode ? Base64.encodeBase64String(TextUtil.getBytes(text)) : BinaryFormatter.appendText(new StringBuilder(), text, length).toString();
+    return encode ? Base64.encodeBase64String(TextUtil.getBytes(text)) : DefaultFormatter.appendText(new StringBuilder(), text, length).toString();
   }
 
   private static String obscuredTabletName(final KeyExtent extent) {

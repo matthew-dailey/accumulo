@@ -21,6 +21,10 @@ import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.ColumnVisibility;
 
+/**
+ * @deprecated Use {@link DefaultFormatter} providing showLength and printTimestamps via {@link FormatterConfig}.
+ */
+@Deprecated
 public class BinaryFormatter extends DefaultFormatter {
   // this class can probably be replaced by DefaultFormatter since DefaultFormatter has the max length stuff
   @Override
@@ -29,8 +33,6 @@ public class BinaryFormatter extends DefaultFormatter {
     return formatEntry(getScannerIterator().next(), config.willPrintTimestamps(), config.getShownLength());
   }
 
-  // this should be replaced with something like Record.toString();
-  // it would be great if we were able to combine code with DefaultFormatter.formatEntry, but that currently does not respect the showLength option.
   public static String formatEntry(Entry<Key,Value> entry, boolean printTimestamps, int shownLength) {
     StringBuilder sb = new StringBuilder();
 
