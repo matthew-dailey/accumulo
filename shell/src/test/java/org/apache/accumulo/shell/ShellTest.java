@@ -33,8 +33,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-import jline.console.ConsoleReader;
-
 import org.apache.accumulo.core.util.format.DateStringFormatter;
 import org.apache.log4j.Level;
 import org.junit.After;
@@ -42,6 +40,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jline.console.ConsoleReader;
 
 public class ShellTest {
   private static final Logger log = LoggerFactory.getLogger(ShellTest.class);
@@ -298,6 +298,27 @@ public class ShellTest {
     exec("scan -fm org.apache.accumulo.core.util.format.DateStringFormatter -st -f 1000", true, expected);
     exec("scan -fm org.apache.accumulo.core.util.format.DateStringFormatter -st -f 5", true, expectedFew);
     exec("scan -fm org.apache.accumulo.core.util.format.DateStringFormatter", true, expectedNoTimestamp);
+    exec("deletetable t -f", true, "Table: [t] has been deleted");
+  }
+
+  @Test
+  public void grepTest() throws IOException {
+    Shell.log.debug("Starting grep test --------------------------");
+    exec("grep", false, "java.lang.IllegalStateException: Not in a table context");
+    exec("createtable t", true);
+    exec("setauths -s vis", true);
+    exec("insert r f q v -ts 0 -l vis", true);
+
+    String expected = "r f:q [vis]    v";
+    String expectedTimestamp = "r f:q [vis] 0    v";
+    exec("grep", false, "No terms specified");
+    exec("grep non_matching_string", true, "");
+    // historically, showing few did not pertain to ColVis or Timestamp
+    exec("grep r", true, expected);
+    exec("grep r -f 1", true, expected);
+    exec("grep r -st", true, expectedTimestamp);
+    exec("grep r -st -f 1", true, expectedTimestamp);
+    exec("setauths -c", true);
     exec("deletetable t -f", true, "Table: [t] has been deleted");
   }
 
