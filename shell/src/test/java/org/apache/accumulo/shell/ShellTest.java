@@ -208,6 +208,37 @@ public class ShellTest {
   }
 
   @Test
+  public void deleteManyTest() throws IOException {
+    exec("deletemany", false, "java.lang.IllegalStateException: Not in a table context");
+    exec("createtable test", true);
+    exec("deletemany", true, "\n");
+
+    exec("insert 0 0 0 0 -ts 0");
+    exec("insert 0 0 0 0 -l 0 -ts 0");
+    exec("insert 1 1 1 1 -ts 1");
+    exec("insert 2 2 2 2 -ts 2");
+
+    // prompts for delete, and rejects by default
+    exec("deletemany", true, "[SKIPPED] 0 0:0 []");
+    exec("deletemany -r 0", true, "[SKIPPED] 0 0:0 []");
+    exec("deletemany -r 0 -f", true, "[DELETED] 0 0:0 []");
+
+    // with auths, can delete the other record
+    exec("setauths -s 0");
+    exec("deletemany -r 0 -f", true, "[DELETED] 0 0:0 [0]");
+
+    // delete will show the timestamp
+    exec("deletemany -r 1 -f -st", true, "[DELETED] 1 1:1 [] 1");
+
+    // DeleteManyCommand has its own Formatter (DeleterFormatter), so it does not honor the -fm flag
+    exec("deletemany -r 2 -f -st -fm org.apache.accumulo.core.util.format.DateStringFormatter", true,
+            "[DELETED] 2 2:2 [] 2");
+
+    exec("setauths -c ", true);
+    exec("deletetable test -f", true, "Table: [test] has been deleted");
+  }
+
+  @Test
   public void authsTest() throws Exception {
     Shell.log.debug("Starting auths test --------------------------");
     exec("setauths x,y,z", false, "Missing required option");
